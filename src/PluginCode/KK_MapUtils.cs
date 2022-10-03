@@ -4,8 +4,10 @@ using BepInEx.Logging;
 using HarmonyLib;
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 using System.Diagnostics;
 using UnityEngine.UI;
+using UnityEngine.Audio;
 //plugin made with the help of IllusionMods/PluginTemplate https://github.com/IllusionMods/PluginTemplate and helpful people in the Koikatsu fan discord https://universalhentai.com/
 namespace KK_MapUtils
 {
@@ -21,7 +23,7 @@ namespace KK_MapUtils
 
         public const string GUID = "koikdaisy.kkmaputils";
 
-        public const string Version = "1.0.0";
+        public const string Version = "1.0.1";
 
         internal static new ManualLogSource Logger;
 
@@ -89,9 +91,7 @@ namespace KK_MapUtils
             private static readonly string VRLightName = "Directional light";
 
             private static readonly string disableCharaLightName = PluginName + "_DisableCharaLight";
-            private static readonly string dayAmbientLightName = PluginName + "_Day";
-            private static readonly string eveningAmbientLightName = PluginName + "_Night";
-            private static readonly string nightAmbientLightName = PluginName + "_Evening";
+            private static readonly string ambientLightName = PluginName + "_Ambient";
 
             private static readonly string[] VRLightParentNames = new string[] { "koikdaisy.kkcamlocklightvr", "Camera (eye)" };
 
@@ -116,6 +116,8 @@ namespace KK_MapUtils
                 });
                 Logger.Log(LogLevel.Debug, PluginName + ": Loaded studio map, disable chara light: " + (GameObject.Find(disableCharaLightName) != null));
                 SetCharaLightEnabled(studioLightName);
+                SetAmbientLight();
+                RouteMapAudio();
 
             }
 
@@ -125,6 +127,8 @@ namespace KK_MapUtils
                 yield return new WaitUntil(() => { return (GameObject.Find("AssetBundleManager").GetComponent<Manager.Scene>().baseScene != null); });
                 Logger.Log(LogLevel.Debug, PluginName + ": Loaded HScene, disable chara light: " + (GameObject.Find(disableCharaLightName) != null));
                 SetCharaLightEnabled(hSceneLightName);
+                SetAmbientLight();
+                RouteMapAudio();
             }
 
             //HSCENE VR GAME COROUTINE
@@ -133,7 +137,11 @@ namespace KK_MapUtils
                 yield return new WaitUntil(() => { return (GameObject.Find("AssetBundleManager").GetComponent<Manager.Scene>().baseScene != null); });
                 Logger.Log(LogLevel.Debug, PluginName + ": Loaded VRHScene, disable chara light: " + (GameObject.Find(disableCharaLightName) != null));
                 SetCharaLightEnabledVR(VRLightName, VRLightParentNames);
+                SetAmbientLight();
+                RouteMapAudio();
             }
+
+
 
             //STUDIO + MAIN GAME EXECUTOR
             private static void SetCharaLightEnabled(string lightName)
@@ -151,23 +159,48 @@ namespace KK_MapUtils
                             break;
                         }
                     }
-                    SetAmbientLight();
+
                 }
             }
+
             /// <summary>
             /// Checks for the existence of point lights named any of the ambient light keywords and sets the ambient light accordingly.
             /// </summary>
             public static void SetAmbientLight()
             {
                 if (!_KK_MapUtils_Enabled.Value) return;
-                GameObject setObject = GameObject.Find(dayAmbientLightName);
-                if (setObject == null) setObject = GameObject.Find(eveningAmbientLightName);
-                if (setObject == null) setObject = GameObject.Find(nightAmbientLightName);
+                GameObject setObject = GameObject.Find(ambientLightName);
                 Light setLight = null;
                 if (setObject != null) { setLight = setObject.GetComponent<Light>(); }
                 if (setLight != null)
                 {
                     RenderSettings.ambientLight = setLight.color;
+                }
+
+
+            }
+            /// <summary>
+            /// Finds the ENV audio mixer group and routes all audio sources on the Map layer to it.
+            /// </summary>
+            public static void RouteMapAudio()
+            {
+                List<AudioSource> mapSounds = new List<AudioSource>();
+                foreach (AudioSource a in Resources.FindObjectsOfTypeAll<AudioSource>())
+                {
+                    if (a.gameObject.layer == LayerMask.NameToLayer("Map")) mapSounds.Add(a);
+                }
+
+                foreach (AudioSource a in Resources.FindObjectsOfTypeAll<AudioSource>())
+                {
+                    if (a.outputAudioMixerGroup.name == "ENV")
+                    {
+                        foreach (AudioSource ms in mapSounds)
+                        {
+                            ms.outputAudioMixerGroup = a.outputAudioMixerGroup;
+                        }
+                        if (a.outputAudioMixerGroup != null) Logger.Log(LogLevel.Debug, PluginName + $": Routed {mapSounds.Count} Audio Source(s) to 'ENV' AudioMixerGroup.");
+                        break;
+                    }
                 }
             }
 
@@ -191,7 +224,6 @@ namespace KK_MapUtils
 
                         }
                     }
-                    SetAmbientLight();
                 }
             }
         }
