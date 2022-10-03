@@ -1,7 +1,7 @@
 # KK_MapUtils v1.0.1
 
 ## Introduction
-Plugin for adjusting various map options set by map makers. Looks for gameobjects in map scenes with specific names.
+Plugin for adjusting various map options set by map makers. Looks for gameobjects in Studio and HMap scenes with specific names.
 
 ## Features
 * Disable Character Light automatically in specially-marked maps
