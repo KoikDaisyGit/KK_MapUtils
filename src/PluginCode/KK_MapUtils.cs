@@ -34,7 +34,7 @@ namespace KK_MapUtils
         {
             Logger = base.Logger;
 
-            _KK_MapUtils_Enabled = Config.Bind("Enable Plugin", "Enabled", true, $"Plugin for adjusting various map options set by map makers. Looks for gameobjects in map scenes with specific names. Any object named 'KK_MapUtils_DisableCharaLight' disables the character light when a scene is loaded. Point lights named 'KK_MapUtils_Day', 'KK_MapUtils_Evening', and 'KK_MapUtils_Night' will determine the ambient light color of the scene.");
+            _KK_MapUtils_Enabled = Config.Bind("Enable Plugin", "Enabled", true, $"Plugin for adjusting various map options set by map makers. View ReadMe.md at https://github.com/KoikDaisyGit/KK_MapUtils for more information.");
 
             if (_KK_MapUtils_Enabled.Value)
             {
