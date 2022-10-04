@@ -1,7 +1,7 @@
-# KK_MapUtils v1.0.1
+# KK_MapUtils v1.0.2
 
 ## Introduction
-Plugin for adjusting various map options set by map makers. Looks for gameobjects in Studio and HMap scenes with specific names.
+Plugin for adjusting various map options set by map makers. Looks for gameobjects in map scenes with specific names. Any object named 'KK_MapUtils_DisableCharaLight' disables the character light when a scene is loaded. Point lights named 'KK_MapUtils_Day', 'KK_MapUtils_Evening', and 'KK_MapUtils_Night' will determine the ambient light color of the scene.
 
 ## Features
 * Disable Character Light automatically in specially-marked maps

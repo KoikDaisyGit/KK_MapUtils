@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using UnityEngine.UI;
 using UnityEngine.Audio;
+using UnityEngine.SceneManagement;
 //plugin made with the help of IllusionMods/PluginTemplate https://github.com/IllusionMods/PluginTemplate and helpful people in the Koikatsu fan discord https://universalhentai.com/
 namespace KK_MapUtils
 {
@@ -23,7 +24,7 @@ namespace KK_MapUtils
 
         public const string GUID = "koikdaisy.kkmaputils";
 
-        public const string Version = "1.0.1";
+        public const string Version = "1.0.2";
 
         internal static new ManualLogSource Logger;
 
@@ -114,10 +115,11 @@ namespace KK_MapUtils
                     //execute when unloading to none.
                     (GameObject.Find("AssetBundleManager").GetComponent<Manager.Scene>().baseScene == null && (GameObject.Find("AssetBundleManager").GetComponent<Manager.Scene>().AddSceneName.Length == 0)));
                 });
+                yield return new WaitUntil(() => SceneManager.GetActiveScene().isLoaded);
                 Logger.Log(LogLevel.Debug, PluginName + ": Loaded studio map, disable chara light: " + (GameObject.Find(disableCharaLightName) != null));
                 SetCharaLightEnabled(studioLightName);
-                SetAmbientLight();
                 RouteMapAudio();
+                SetAmbientLight();
 
             }
 
@@ -175,6 +177,7 @@ namespace KK_MapUtils
                 if (setLight != null)
                 {
                     RenderSettings.ambientLight = setLight.color;
+                    Logger.Log(LogLevel.Debug, PluginName + ": Set ambient light color.");
                 }
 
 
