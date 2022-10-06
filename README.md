@@ -5,7 +5,7 @@ Plugin for adjusting various map options set by map makers. Looks for GameObject
 
 ## Features
 * Disable Character Light automatically in specially-marked maps
-* Dynamically adjust map ambient light color
+* Dynamically adjust map ambient light color based on time of day
 * Automatically route audio sources to "Environment" audio slider
 
 ### Compatible with:
